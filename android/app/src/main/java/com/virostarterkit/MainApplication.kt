@@ -1,50 +1,54 @@
 package com.virostarterkit
-import com.viromedia.bridge.ReactViroPackage
 
 import android.app.Application
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
-import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeHost
 import com.facebook.react.ReactPackage
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
-import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
-import com.facebook.react.flipper.ReactNativeFlipper
 import com.facebook.soloader.SoLoader
+import com.virostarterkit.DepthSensorPackage
+import com.virostarterkit.SensorFusionPackage
+import com.viromedia.bridge.ReactViroPackage
+// Uncomment the line below if you have debug/java/com/virostarterkit/ReactNativeFlipper.java
+// import com.virostarterkit.ReactNativeFlipper
 
 class MainApplication : Application(), ReactApplication {
 
-  override val reactNativeHost: ReactNativeHost =
-      object : DefaultReactNativeHost(this) {
-        override fun getPackages(): List<ReactPackage> =
-            PackageList(this).packages.apply {
-              // Packages that cannot be autolinked yet can be added manually here, for example:
-              // add(MyReactNativePackage())
-              
-              // https://viro-community.readme.io/docs/installation-instructions#5-now-add-the-viro-package-to-your-mainapplication
-              add(ReactViroPackage(ReactViroPackage.ViroPlatform.GVR))
-              add(ReactViroPackage(ReactViroPackage.ViroPlatform.AR))
-            }
+    // ✅ Proper override of the abstract property required by ReactApplication
+    override val reactNativeHost: ReactNativeHost = object : DefaultReactNativeHost(this) {
+
+        override fun getPackages(): List<ReactPackage> {
+            val packages = PackageList(this@MainApplication).packages.toMutableList()
+            packages.add(DepthSensorPackage())
+            packages.add(SensorFusionPackage())
+            packages.add(ReactViroPackage(ReactViroPackage.ViroPlatform.GVR))
+            packages.add(ReactViroPackage(ReactViroPackage.ViroPlatform.AR))
+            return packages
+        }
 
         override fun getJSMainModuleName(): String = "index"
 
         override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
 
-        override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
-        override val isHermesEnabled: Boolean = BuildConfig.IS_HERMES_ENABLED
-      }
+        override val isNewArchEnabled: Boolean
+            get() = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED.toString().toBoolean()
 
-  override val reactHost: ReactHost
-    get() = getDefaultReactHost(this.applicationContext, reactNativeHost)
-
-  override fun onCreate() {
-    super.onCreate()
-    SoLoader.init(this, false)
-    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
-      // If you opted-in for the New Architecture, we load the native entry point for this app.
-      load()
+        override val isHermesEnabled: Boolean
+            get() = BuildConfig.IS_HERMES_ENABLED
     }
-    ReactNativeFlipper.initializeFlipper(this, reactNativeHost.reactInstanceManager)
-  }
+
+    override fun onCreate() {
+        super.onCreate()
+        SoLoader.init(this, false)
+
+        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED.toString().toBoolean()) {
+            load()
+        }
+
+        // If you created this file: android/app/src/debug/java/com/virostarterkit/ReactNativeFlipper.java
+        // Then uncomment the line below:
+       // ReactNativeFlipper.initializeFlipper(this, reactNativeHost.reactInstanceManager)
+    }
 }

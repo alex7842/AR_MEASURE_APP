@@ -3,9 +3,10 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 type Props = {
   actionRef: any;
+  useDepthSensor?: boolean | null; // Optional prop to control depth sensor usage
 };
 
-const OverlayControls = ({ actionRef }: Props) => {
+const OverlayControls = ({ actionRef,useDepthSensor }: Props) => {
   return (
     <View style={styles.overlay}>
       <TouchableOpacity

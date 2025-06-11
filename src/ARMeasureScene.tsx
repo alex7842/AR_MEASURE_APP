@@ -8,6 +8,7 @@ import {
   ViroSphere,
 } from "@reactvision/react-viro";
 import { StyleSheet } from "react-native";
+import { SensorData } from "./native-modules/SensorFusionModule";
 
 type Position3D = [number, number, number];
 
@@ -24,9 +25,11 @@ ViroMaterials.createMaterials({
 
 interface ARMeasureSceneProps {
   actionRef?: React.MutableRefObject<any>;
+  sensorData?:SensorData | null; // Optional sensor data prop for advanced features
+  useSensorFusion?: boolean; // Optional prop to control sensor fusion usage
 }
 
-const ARMeasureScene: React.FC<ARMeasureSceneProps> = ({ actionRef }) => {
+const ARMeasureScene: React.FC<ARMeasureSceneProps> = ({ actionRef,sensorData ,useSensorFusion}) => {
   const [currentPoints, setCurrentPoints] = useState<Position3D[]>([]);
   const [finishedMeasurements, setFinishedMeasurements] = useState<Position3D[][]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
